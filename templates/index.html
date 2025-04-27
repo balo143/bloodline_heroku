@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodLine - Save Lives</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        header {
+            background: linear-gradient(90deg, #d32f2f, #ff6f61);
+            color: white;
+            padding: 1em;
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            display: inline-block;
+            animation: heartbeat 1.5s infinite;
+        }
+        nav {
+            margin-top: 1em;
+            display: flex;
+            justify-content: center;
+            gap: 0.5em;
+            flex-wrap: wrap;
+        }
+        nav a {
+            background: white;
+            color: #d32f2f;
+            padding: 0.5em 1em;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 1em;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        nav a:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        main {
+            padding: 2em;
+            text-align: center;
+        }
+        .welcome-section {
+            margin-bottom: 2em;
+        }
+        .welcome-section h2 {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 0.5em;
+            animation: slideIn 1s ease-out;
+        }
+        .welcome-section p {
+            font-size: 1.2em;
+            color: #666;
+            animation: fadeIn 1s ease-in 0.5s forwards;
+            opacity: 0;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1em;
+        }
+        .action-btn {
+            padding: 1em 2em;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1.2em;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .search-btn { background: #696969; }
+        .support-btn { background: #228b22; }
+        .request-btn { background: #ff4040; }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+            width: 100%;
+            animation: fadeIn 1s ease-in;
+            position: fixed;
+            bottom: 0;
+        }
+        .success, .error {
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 5px;
+            text-align: center;
+            animation: popIn 0.5s ease-out;
+        }
+        .success {
+            background-color: #4caf50;
+            color: white;
+        }
+        .error {
+            background-color: #f44336;
+            color: white;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.1); }
+            40% { transform: scale(1); }
+            60% { transform: scale(1.1); }
+            80% { transform: scale(1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>BloodLine</h1>
+        <nav>
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('search') }}">Search</a>
+            <a href="{{ url_for('donate') }}">Donate</a>
+            <a href="{{ url_for('request_blood') }}">Request</a>
+        </nav>
+    </header>
+    <main>
+        <div class="welcome-section">
+            <h2>Welcome to BloodLine</h2>
+            <p>Connecting donors with those in need.</p>
+            {% if message %}
+                <div class="{{ type }}">{{ message }}</div>
+            {% endif %}
+        </div>
+        <div class="action-buttons">
+            <a href="{{ url_for('search') }}" class="action-btn search-btn">Search for Donors</a>
+            <a href="{{ url_for('donate') }}" class="action-btn support-btn">Support Us</a>
+            <a href="{{ url_for('request_blood') }}" class="action-btn request-btn">Request Blood</a>
+        </div>
+    </main>
+    <footer>
+        <p>© 2025 BloodLine. All rights reserved.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

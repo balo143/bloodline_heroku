@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloodLine - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+</head>
+<body>
+    <header>
+        <h1>BloodLine</h1>
+        <nav>
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('register') }}">Register</a>
+    <a href="{{ url_for('search') }}">Search</a>
+    <a href="{{ url_for('donate') }}">Donate</a>
+    <a href="{{ url_for('request_blood') }}">Request</a>
+</nav>
+    </header>
+    <main>
+        <section>
+            <h2>Search Results</h2>
+            {% if donors %}
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Blood Group</th>
+                        <th>Location</th>
+                        <th>Phone</th>
+                    </tr>
+                    {% for donor in donors %}
+                        <tr>
+                            <td>{{ donor['id'] }}</td>
+                            <td>{{ donor['name'] }}</td>
+                            <td>{{ donor['blood_group'] }}</td>
+                            <td>{{ donor['location'] }}</td>
+                            <td>{{ donor['phone'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="error">No donors found.</p>
+            {% endif %}
+            <div style="margin-top: 1em;">
+                <a href="{{ url_for('search') }}"><button>Search Again</button></a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 BloodLine. All rights reserved.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

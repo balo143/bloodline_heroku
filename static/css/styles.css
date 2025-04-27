@@ -1,0 +1,175 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+header {
+    background: linear-gradient(90deg, #d32f2f, #ff6f61);
+    color: white;
+    padding: 1em;
+    text-align: center;
+    animation: fadeIn 1s ease-in;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    display: inline-block;
+    animation: heartbeat 1.5s infinite;
+}
+
+nav {
+    margin-top: 1em;
+    display: flex;
+    justify-content: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
+}
+
+nav a {
+    background: white;
+    color: #d32f2f;
+    padding: 0.5em 1em;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 1em;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav a:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+main {
+    padding: 2em;
+    animation: fadeIn 1s ease-in;
+}
+
+section {
+    opacity: 0;
+    animation: slideIn 0.8s ease-out forwards;
+    animation-delay: 0.2s;
+}
+
+/* Global Button Styling */
+.btn {
+    padding: 0.8em 1.5em;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.2em;
+    text-decoration: none;
+    background: linear-gradient(90deg, #d32f2f, #ff6f61);
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    animation: pulse 2s infinite;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 1em;
+    width: 100%;
+    animation: fadeIn 1s ease-in;
+    position: fixed;
+    bottom: 0;
+}
+
+.success, .error {
+    padding: 1em;
+    margin: 1em 0;
+    border-radius: 5px;
+    text-align: center;
+    animation: popIn 0.5s ease-out;
+}
+
+.success {
+    background-color: #4caf50;
+    color: white;
+}
+
+.error {
+    background-color: #f44336;
+    color: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1em;
+    animation: fadeIn 1s ease-in;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 0.8em;
+    text-align: center;
+}
+
+th {
+    background-color: #d32f2f;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+    transform: translateY(-2px);
+    transition: transform 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    20% { transform: scale(1.1); }
+    40% { transform: scale(1); }
+    60% { transform: scale(1.1); }
+    80% { transform: scale(1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes bounceIn {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}

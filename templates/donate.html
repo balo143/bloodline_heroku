@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate - BloodLine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <style>
+        .donate-container {
+            max-width: 500px;
+            margin: 2em auto;
+            padding: 2em;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border: 1px solid #e0e0e0;
+        }
+        .donate-container h2 {
+            color: #d32f2f;
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 0.5em;
+        }
+        .donate-container p {
+            text-align: center;
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 1em;
+        }
+        .donate-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2em;
+        }
+        .donate-form label {
+            font-weight: bold;
+            color: #333;
+        }
+        .donate-form select,
+        .donate-form input {
+            padding: 0.7em;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        .donate-form select:focus,
+        .donate-form input:focus {
+            border-color: #d32f2f;
+            outline: none;
+        }
+        .error {
+            color: red;
+            text-align: center;
+        }
+        .success {
+            color: green;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>BloodLine</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('search') }}">Search</a>
+            <a href="{{ url_for('donate') }}">Donate</a>
+            <a href="{{ url_for('request_blood') }}">Request</a>
+        </nav>
+    </header>
+    <main>
+        <section class="donate-container">
+            <h2>Make a Donation</h2>
+            <p>Support our cause with a donation.</p>
+            {% if message %}
+                <div class="{{ type }}">{{ message }}</div>
+            {% endif %}
+            <form class="donate-form" method="POST" action="{{ url_for('donate') }}">
+                <label for="donor_name">Donor Name:</label>
+                <select id="donor_name" name="donor_name" required>
+                    <option value="">Select a Donor</option>
+                    {% for donor in donors %}
+                        <option value="{{ donor[0] }}">{{ donor[0] }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" required>
+
+                <label for="payment_method">Payment Method:</label>
+                <select id="payment_method" name="payment_method" required>
+                    <option value="">Select Payment Method</option>
+                    <option value="gpay">Google Pay</option>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                </select>
+
+                <button type="submit" class="btn">Donate</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>© 2025 BloodLine. All rights reserved.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
