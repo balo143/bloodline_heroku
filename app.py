@@ -1,17 +1,56 @@
+import os
+import requests
+import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from urllib.parse import urlencode
 from datetime import datetime
-import sqlite3
 from twilio.rest import Client
 
-app = Flask(__name__)
+# Download or create the database
+if not os.path.exists('bloodline.db'):
+    try:
+        url = "https://drive.google.com/uc?export=download&id=1A2B3C4D5E6F7G8H9I0J"  # Replace with your actual FILE_ID
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+        with open('bloodline.db', 'wb') as f:
+            f.write(r.content)
+    except Exception as e:
+        print(f"Failed to download bloodline.db: {str(e)}")
+        # Create an empty database as a fallback
+        conn = sqlite3.connect('bloodline.db')
+        conn.execute('''CREATE TABLE IF NOT EXISTS donors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            blood_group TEXT NOT NULL,
+            location TEXT NOT NULL,
+            phone TEXT NOT NULL
+        )''')
+        conn.execute('''CREATE TABLE IF NOT EXISTS requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            blood_group TEXT NOT NULL,
+            location TEXT NOT NULL,
+            phone TEXT NOT NULL,
+            needed_by TEXT NOT NULL
+        )''')
+        conn.execute('''CREATE TABLE IF NOT EXISTS donations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            donor_name TEXT NOT NULL,
+            amount INTEGER NOT NULL,
+            payment_method TEXT NOT NULL,
+            payment_details TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )''')
+        conn.commit()
+        conn.close()
 
-# Twilio credentials (replace with your own)
-TWILIO_ACCOUNT_SID = 'your_account_sid'
-TWILIO_AUTH_TOKEN = 'your_auth_token'
-TWILIO_PHONE_NUMBER = 'your_twilio_number'
-
+# Twilio credentials
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE_NUMBER = os.getenv('TWILIO_PHONE_NUMBER')
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
+app = Flask(__name__)
 
 # Database connection helper
 def get_db_connection():
@@ -150,17 +189,22 @@ def request_blood():
 
             # Notify matching donors via SMS
             donors = conn.execute('''
-                SELECT phone FROM donors 
+                SELECT phone FROM donors
                 WHERE blood_group = ? AND location = ?
             ''', (blood_group, location)).fetchall()
 
             for donor in donors:
-                donor_phone = f"+91{donor['phone']}"  # Format for Indian numbers
-                message = client.messages.create(
-                    body=f"Urgent request: {name} needs {blood_group} blood in {location}. Contact: {phone}. Required by: {needed_by}.",
-                    from_=TWILIO_PHONE_NUMBER,
-                    to=donor_phone
-                )
+                donor_phone = f"+91{donor['phone']}"
+                try:
+                    message = client.messages.create(
+                        body=f"Urgent request: {name} needs {blood_group} blood in {location}. Contact: {phone}. Required by: {needed_by}.",
+                        from_=TWILIO_PHONE_NUMBER,
+                        to=donor_phone
+                    )
+                    print(f"SMS sent to {donor_phone}: {message.sid}")
+                except Exception as e:
+                    print(f"Failed to send SMS to {donor_phone}: {str(e)}")
+                    # Continue with the next donor instead of failing
 
             conn.commit()
             conn.close()
@@ -208,9 +252,8 @@ def payment_simulation():
     order_id = request.args.get('order_id')
     callback_url = request.args.get('callback_url')
     payment_method = request.args.get('payment_method')
-    print(f"Payment method in /payment_simulation: '{payment_method}'")  # Debug print
+    print(f"Payment method in /payment_simulation: '{payment_method}'")
 
-    # Base confirmation details with proper HTML structure
     html = f"""<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -218,14 +261,14 @@ def payment_simulation():
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Payment Simulation - BloodLine</title>
         <style>
-            body {{ font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }}
-            h1 {{ color: #d32f2f; text-align: center; }}
-            p {{ font-size: 1.1em; }}
-            form {{ margin-top: 20px; }}
-            label {{ display: block; margin: 10px 0 5px; font-weight: bold; }}
-            input[type="text"] {{ width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }}
-            button {{ background-color: #d32f2f; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }}
-            button:hover {{ background-color: #b71c1c; }}
+            body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+            h1 { color: #d32f2f; text-align: center; }
+            p { font-size: 1.1em; }
+            form { margin-top: 20px; }
+            label { display: block; margin: 10px 0 5px; font-weight: bold; }
+            input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+            button { background-color: #d32f2f; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+            button:hover { background-color: #b71c1c; }
         </style>
     </head>
     <body>
@@ -236,7 +279,6 @@ def payment_simulation():
         <p>Payment Method: {payment_method.upper()}</p>
     """
 
-    # Add payment details form based on payment method
     if payment_method == 'credit_card':
         html += ('<h3>Enter Credit Card Details</h3><form action="{}" method="POST">'
                  '<input type="hidden" name="name" value="{}">'
@@ -281,12 +323,11 @@ def payment_callback():
         name = request.form.get('name')
         amount = request.form.get('amount')
         payment_method = request.form.get('payment_method')
-        print(f"Form data in /payment_callback: {request.form}")  # Debug print
+        print(f"Form data in /payment_callback: {request.form}")
 
         if not name or not amount or not payment_method:
             raise ValueError("Missing required fields: name, amount, or payment_method")
 
-        # Collect payment details based on payment method
         if payment_method == 'credit_card':
             card_number = request.form.get('card_number')
             expiry = request.form.get('expiry')
@@ -313,7 +354,7 @@ def payment_callback():
         return redirect(url_for('donate', message=f'Thank you, {name}, for your {payment_method.upper()} donation of ₹{amount}!', type='success'))
     except Exception as e:
         return redirect(url_for('donate', message=f'Error: {str(e)}', type='error'))
+
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
